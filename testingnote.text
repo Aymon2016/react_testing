@@ -1,51 +1,97 @@
 
 
-react testing library link
-    https://testing-library.com/docs/react-testing-library/cheatsheet
+get
 
-jest dom link
-    https://github.com/testing-library/jest-dom
+getBy : returns the matching node, however will throw an error if multiple matches or no matches are found.
+getAllBy : returns an array of matching nodes if at least one match is found and throws an error if no match is found.
+Tip : Use these methods if you expect the element / elements to be present upon query.
 
-How to test component
-    1.create a test file as button.test.js 
-    2.import method as  import { render, screen } from '@testing-library/react';
-    3.import button component as import App from './App';
-    4.write test code as 
-                        test('button has correct initial color', () => {
-                            render(<App />)
-                            const button = screen.getByRole('button', { name: /blue/i });
-                            expect(button).toHaveStyle('background-color:red')
-                        });
-    5.read doc file
-    6.this is first react component test code 
+query
 
-        import { render, screen, fireEvent } from '@testing-library/react';
-        import App from './App';
+queryBy : returns the matching node if one match is found and null if no match is found, however will throw an error if multiple matches are found.
+queryAllBy : returns an array of matching nodes if at least one match is found and an empty array if no match is found.
+Tip : Use these methods if you are looking to confirm presence of an element / elements.
 
-        describe('red-blue button', () => {
-        test('button has correct initial color', () => {
-            render(<App />)
-            const button = screen.getByRole('button', { name: /blue/i });
-            expect(button).toHaveStyle('background-color:red')
-        });
+find
 
-        test('button has correct initial text', () => {
-            render(<App />)
-            const button = screen.getByRole('button', { name: /blue/i });
-            expect(button).toHaveTextContent('color is blue')
-        });
+findBy : returns a promise that returns the matching node, however will throw an error if multiple matches or no matches are found.
+findAllBy : returns a promise that returns an array of matching nodes if at least one match is found and throws an error if no match is found.
+Tip : Use these methods if the element / elements being queried might display asynchronously (for example, if your element is expected to only display after an event is fired consider using find as it retries the query after some time).
 
-        test('button turns blue when clicked', () => {
-            render(<App />)
-            const button = screen.getByRole('button', { name: /blue/i });
-            fireEvent.click(button)
-            expect(button).toHaveStyle('background-color:blue')
-        });
+const view = render(<Skills skills={skills} />)
+1.logRoles(view.container) use for view dom element;
+2.pointer interection method is 
+    1.convenience Apis
+        1.click()
+        2.dblclick()
+        3.hover()
+        4.tripleClick()
+        5.rightClick()
+        6.focus()
+        7.unhover()
+3.pointer Apis
+    1.pointer({keys:'[mouseRight]'})
+    2.pointer({keys:'[mouseLeft]'})
+    3.pointer({keys:'[mouseMiddle]'})
+    4.pointer({keys:'[mouseLeft][mouseRight]'})
+    5.pointer({keys:'[mouseLeft][mouseMiddle]'})
+    6.pointer({keys:'[mouseRight][mouseMiddle]'})
 
-        test('button text changed when clicked', () => {
-            render(<App />)
-            const button = screen.getByRole('button', { name: /blue/i });
-            fireEvent.click(button)
-            expect(button).toHaveTextContent('color is red blue')
-        });
+4.utiliy Apis
+    1.clear()
+        test('clear', async() => {
+        render(<textarea defaultValue="hello world/>)
+        await userEvent.clear(screen.getByRole('textbox))
+        expect(screen.getByRole('textbox)).toHaveValue('')
         })
+    2.type()
+    3.paste()
+    4.upload()
+         test('upload file', async() => {
+        render(
+         <div>
+          <label>Upload file</label>
+          <input id="file-uploader" type="file" />
+         </div>
+        )
+       const file = new File(['hello'],'hello.png',{type:'image/png})
+       const input = screen.getByLabelText(/upload file/i)
+       await userEvent.upload(input,file)
+       expect(input.files[0]).toBe(file)
+        expect(input.files.item(0)).toBe(file)
+         expect(input.files).toHaveLength(1)
+
+        })
+
+    5.download()
+    6.deselectOptions()
+        test('selectOptions', async() => {
+        render(
+            <select multiple>
+            <option value="1">a</option>
+            <option value="2">b</option>
+            <option value="3">c</option>
+             </select>
+        )
+        await userEvent.deselectOptions(screen.getByRole('listbox),'2')
+        expect(screen.getByRole('b').selected).toBe(false)
+        })
+    6.selectOptions()
+        test('selectOptions', async() => {
+        render(
+            <select multiple>
+            <option value="1">a</option>
+            <option value="2">b</option>
+            <option value="3">c</option>
+             </select>
+        )
+        await userEvent.selectOptions(screen.getByRole('listbox),['1','c'])
+        expect(screen.getByRole('option',{name:'a;}).selected).toBe(true)
+        expect(screen.getByRole('option',{name:'b;}).selected).toBe(false)
+        expect(screen.getByRole('option',{name:'c;}).selected).toBe(true)
+        })
+ 7.keyboard Apis
+  1.cut()
+  2.copy()
+  3.paste()
+
