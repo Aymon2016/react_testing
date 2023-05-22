@@ -95,3 +95,90 @@ const view = render(<Skills skills={skills} />)
   2.copy()
   3.paste()
 
+Note that wraper componet test.this is important for redux and state management.
+    1.we make custom render funtion redux and state management.
+
+            import { render } from '@testing-library/react'
+            import { AppProviders } from '../provider/appProvider'
+
+
+
+            const customRender = (ui, options) =>
+                render(ui, { wrapper: AppProviders, ...options })
+
+            // re-export everything
+            export * from '@testing-library/react'
+
+            // override render method
+            export { customRender as render }
+
+    2.then we import and call provider funtion in custom render funtion
+
+Note:react hook funtion not return jsx so when we testing react hook.we get error
+    .then if we call useCounter() also get error.bcz hook not call in funtion
+    .so rtl provide a hook call funtion 
+            renderHook()
+             test('should render the initial count', () => {
+                const { result } = renderHook(useCounter, {
+                    initialProps: {
+                        initialCount: 0,
+                    }
+                })
+                expect(result.current.count).toBe(0)
+            })
+
+
+Note:fetch funtion test kora onek cost pore tai amder akta server create kore test 
+    kora lage ter jonno amader use korte pari mock service worker library tai
+
+    first doc teke msw ta install kori
+
+    1.create server.js 
+
+        // src/mocks/server.js
+        import { setupServer } from 'msw/node'
+        import { handlers } from './handlers'
+
+        // This configures a request mocking server with the given request handlers.
+        export const server = setupServer(...handlers)
+    2.create a hander.js file   
+        import { rest } from 'msw'
+
+            export const handlers = [
+                rest.get('https://jsonplaceholder.typicode.com/users', (req, res, ctx) => {
+                    return res(
+                        ctx.status(200),
+                        ctx.json([
+                            {
+                                name: 'Bruce Wayne',
+                            },
+                            {
+                                name: 'Clark Kent',
+                            },
+                            {
+                                name: 'Princess Diana',
+                            },
+                        ])
+                    )
+                }),
+            ]
+    3.setupTest.js file e ai ta add kora lagbe
+
+        // src/setupTests.js
+        import { server } from '../src/component/httpMock/msw/server'
+        // Establish API mocking before all tests.
+        beforeAll(() => server.listen())
+
+        // Reset any request handlers that we may add during the tests,
+        // so they don't affect other tests.
+        afterEach(() => server.resetHandlers())
+
+        // Clean up after the tests are finished.
+        afterAll(() => server.close())
+    4.complete virtual server make kora akon test korte pari
+
+        test('renders a list of users', async () => {
+        render(<Users />)
+        const users = await screen.findAllByRole('listitem')
+        expect(users).toHaveLength(3)
+        })
